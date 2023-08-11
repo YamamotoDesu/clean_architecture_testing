@@ -142,7 +142,7 @@ import 'package:http/http.dart' as http;
 void main() {}
 ```
 
-Generate 'test_helper.mocks.dart'
+Generate `test_helper.mocks.dart`
 ```
 flutter packages pub run build_runner build
 ```
