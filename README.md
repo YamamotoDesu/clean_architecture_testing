@@ -41,3 +41,72 @@ dev_dependencies:
   mocktail: ^0.2.0
   flutter_lints: ^2.0.0
 ```
+
+lib/domain/entities/weather.dart
+```dart
+import 'package:equatable/equatable.dart';
+
+class WeatherEntity extends Equatable {
+  const WeatherEntity({
+    required this.cityName,
+    required this.main,
+    required this.description,
+    required this.iconCode,
+    required this.temperature,
+    required this.pressure,
+    required this.humidity,
+  });
+
+  final String cityName;
+  final String main;
+  final String description;
+  final String iconCode;
+  final double temperature;
+  final int pressure;
+  final int humidity;
+
+  @override
+  List<Object?> get props => [
+        cityName,
+        main,
+        description,
+        iconCode,
+        temperature,
+        pressure,
+        humidity,
+      ];
+}
+```
+
+lib/domain/repositories/weather_repository.dart
+```dart
+
+import 'package:clean_architecture_testing/core/error/failure.dart';
+import 'package:clean_architecture_testing/domain/entities/weather.dart';
+import 'package:dartz/dartz.dart';
+
+abstract class WeatherRepository {
+  Future<Either<Failure, WeatherEntity>> getCurrentWeather(
+    String cityName,
+  );
+}
+```
+
+lib/domain/usecases/get_current_weather.dart
+```dart
+import 'package:clean_architecture_testing/core/error/failure.dart';
+import 'package:clean_architecture_testing/domain/entities/weather.dart';
+import 'package:dartz/dartz.dart';
+
+import '../repositories/weather_repository.dart';
+
+class GetCurrentWeatherUseCase {
+  final WeatherRepository repository;
+
+  GetCurrentWeatherUseCase(this.repository);
+
+  Future<Either<Failure, WeatherEntity>> execute(String cityName) {
+    return repository.getCurrentWeather(cityName);
+  }
+}
+```
