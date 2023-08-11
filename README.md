@@ -143,7 +143,7 @@ void main() {}
 ```
 
 Generate 'test_helper.mocks.dart'
-'''
+```
 flutter packages pub run build_runner build
 ```
 
