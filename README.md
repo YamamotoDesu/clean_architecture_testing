@@ -1,4 +1,4 @@
-# Flutter Clean Architecutre & TDD
+# 🚧 Flutter Clean Architecutre & TDD
 
 ## [Add Packages & Create Folders | PART1](https://www.youtube.com/watch?v=Nh88g4FqQyY&list=WL&index=15)
 
@@ -20,7 +20,7 @@
   - presentation
 ```
 
-### Configuration Settings
+### 📦️ Configuration Settings
 pubspec.yaml
 ```yaml
 dependencies:
@@ -45,7 +45,7 @@ dev_dependencies:
   flutter_lints: ^2.0.0
 ```
 
-### Prepare clean architecture classes for testing
+### 🏗️ Prepare clean architecture classes for testing
 lib/domain/entities/weather.dart
 ```dart
 import 'package:equatable/equatable.dart';
@@ -130,6 +130,7 @@ class GetCurrentWeatherUseCase {
   - presentation
 ```
 
+### 🧑‍💻 Create test helpers
 test/helpers/test_helper.dart
 ```dart
 import 'package:clean_architecture_testing/domain/repositories/weather_repository.dart';
@@ -152,5 +153,52 @@ Generate `test_helper.mocks.dart`
 flutter packages pub run build_runner build
 ```
 
+### ✅ Add a test class for an abstract class using a mock
+
+test/domain/usecases/get_current_weather_test.dart
+```dart
+import 'package:clean_architecture_testing/domain/entities/weather.dart';
+import 'package:clean_architecture_testing/domain/usecases/get_current_weather.dart';
+import 'package:dartz/dartz.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/mockito.dart';
+
+import '../../helpers/test_helper.mocks.dart';
+
+void main() {
+  late GetCurrentWeatherUseCase getCurrentWeatherUseCase;
+  late MockWeatherRepository mockWeatherRepository;
+
+  setUp(() {
+    mockWeatherRepository = MockWeatherRepository();
+    getCurrentWeatherUseCase = GetCurrentWeatherUseCase(mockWeatherRepository);
+  });
+
+  const testWeatherDetail = WeatherEntity(
+    cityName: 'Tokyo',
+    main: 'Clouds',
+    description: 'scattered clouds',
+    iconCode: '03n',
+    temperature: 279.32,
+    pressure: 1016,
+    humidity: 93,
+  );
+
+  const testCityName = 'Tokyo';
+
+  test('should get current weather detail from the repository', () async {
+    // arrange
+    when(
+      mockWeatherRepository.getCurrentWeather(testCityName),
+    ).thenAnswer((_) async => const Right(testWeatherDetail));
+
+    // act
+    final result = await getCurrentWeatherUseCase.execute(testCityName);
+
+    // assert
+    expect(result, const Right(testWeatherDetail));
+  });
+}
+```
 
 
