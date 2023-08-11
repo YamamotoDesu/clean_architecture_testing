@@ -110,3 +110,42 @@ class GetCurrentWeatherUseCase {
   }
 }
 ```
+
+## [Use Case Testing | PART 2](https://www.youtube.com/watch?v=PQ4Bk3ocdeI)
+
+```
+- test
+  - data
+  - domain
+    - usecases
+      - get_current_weather_test.dart
+  - helpers
+    - test_helper.dart
+    - test_helper.mocks.dart
+  - presentation
+```
+
+test/helpers/test_helper.dart
+```dart
+import 'package:clean_architecture_testing/domain/repositories/weather_repository.dart';
+import 'package:mockito/annotations.dart';
+import 'package:http/http.dart' as http;
+
+@GenerateMocks(
+  [WeatherRepository],
+  customMocks: [
+    MockSpec<http.Client>(
+      as: #MockHttpClient,
+    ),
+  ],
+)
+void main() {}
+```
+
+Generate 'test_helper.mocks.dart'
+'''
+flutter packages pub run build_runner build
+```
+
+
+
