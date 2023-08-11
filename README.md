@@ -269,7 +269,7 @@ class WeatherModel extends WeatherEntity {
 }
 ```
 
-### 🤡 Prepare a dummy JSON and a helper class for reading
+### 🤡 Prepare a dummy JSON and a helper class for reading it
 
 test/helpers/dummy_data/dummy_weather_response.json
 ```json
