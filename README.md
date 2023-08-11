@@ -1,6 +1,8 @@
 # Flutter Clean Architecutre & TDD
 
 ## [Add Packages & Create Folders | PART1](https://www.youtube.com/watch?v=Nh88g4FqQyY&list=WL&index=15)
+
+### Project Tree
 ```dart
 - lib
   - core
@@ -18,6 +20,7 @@
   - presentation
 ```
 
+### Configuration Settings
 pubspec.yaml
 ```yaml
 dependencies:
@@ -42,6 +45,7 @@ dev_dependencies:
   flutter_lints: ^2.0.0
 ```
 
+### Prepare clean architecture classes for testing
 lib/domain/entities/weather.dart
 ```dart
 import 'package:equatable/equatable.dart';
@@ -113,6 +117,7 @@ class GetCurrentWeatherUseCase {
 
 ## [Use Case Testing | PART 2](https://www.youtube.com/watch?v=PQ4Bk3ocdeI)
 
+### Project Tree
 ```
 - test
   - data
