@@ -203,6 +203,26 @@ void main() {
 
 ## [Model Testing | Part 3](https://www.youtube.com/watch?v=0MbGFiOUGGg)
 
+```
+- lib
+  - data
+    - data_sources
+    - models
+      - weather_model.dart
+    - repositories
+
+- test
+  - data
+    - data_sources
+    - models
+      - weather_model_test.dart
+    - repositories
+  - helpers
+    - dummy_data
+      - dummy_weather_response.json
+    - json_reader.dart
+```
+
 lib/data/models/weather_model.dart
 ### 🏗️ Prepare a model class for testing
 ```dart
