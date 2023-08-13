@@ -404,6 +404,98 @@ void main() {
 }
 ```
 
+## [API Calling Testing | PART 4](https://youtu.be/5YQg1MpXpmE)
 
+```dart
+import 'package:clean_architecture_testing/constants/constants.dart';
+import 'package:clean_architecture_testing/core/error/exception.dart';
+import 'package:clean_architecture_testing/data/data_sources/remote_data_source.dart';
+import 'package:clean_architecture_testing/data/models/weather_model.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/mockito.dart';
+import 'package:http/http.dart' as http;
+import '../../helpers/json_reader.dart';
+import '../../helpers/test_helper.mocks.dart';
+
+void main() {
+  late MockHttpClient mockHttpClient;
+  late WeatherRemoteDataSourceImpl weatherRemoteDataSourceImpl;
+
+  setUp(() {
+    mockHttpClient = MockHttpClient();
+    weatherRemoteDataSourceImpl =
+        WeatherRemoteDataSourceImpl(client: mockHttpClient);
+  });
+
+  const testCityName = 'New York';
+
+  group('get current weather', () {
+    test('should return weather model when the response code is 200', () async {
+      //arrange
+      when(mockHttpClient
+              .get(Uri.parse(Urls.currentWeatherByName(testCityName))))
+          .thenAnswer((_) async => http.Response(
+              readJson('helpers/dummy_data/dummy_weather_response.json'), 200));
+
+      //act
+      final result =
+          await weatherRemoteDataSourceImpl.getCurrentWeather(testCityName);
+
+      //assert
+      expect(result, isA<WeatherModel>());
+    });
+
+    test(
+      'should throw a server exception when the response code is 404 or other',
+      () async {
+        //arrange
+        when(
+          mockHttpClient
+              .get(Uri.parse(Urls.currentWeatherByName(testCityName))),
+        ).thenAnswer((_) async => http.Response('Not found', 404));
+
+        //act
+        final result =
+            weatherRemoteDataSourceImpl.getCurrentWeather(testCityName);
+
+        //assert
+        expect(result, throwsA(isA<ServerException>()));
+      },
+    );
+  });
+}
+```
+
+lib/data/data_sources/remote_data_source.dart
+```dart
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
+
+import '../../constants/constants.dart';
+import '../../core/error/exception.dart';
+import '../models/weather_model.dart';
+
+abstract class WeatherRemoteDataSource {
+  Future<WeatherModel> getCurrentWeather(String cityName);
+}
+
+class WeatherRemoteDataSourceImpl extends WeatherRemoteDataSource {
+  final http.Client client;
+  WeatherRemoteDataSourceImpl({required this.client});
+
+  @override
+  Future<WeatherModel> getCurrentWeather(String cityName) async {
+    final response =
+        await client.get(Uri.parse(Urls.currentWeatherByName(cityName)));
+
+    if (response.statusCode == 200) {
+      return WeatherModel.fromJson(json.decode(response.body));
+    } else {
+      throw ServerException();
+    }
+  }
+}
+```
 
 
