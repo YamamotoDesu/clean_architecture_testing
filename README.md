@@ -406,6 +406,7 @@ void main() {
 
 ## [API Calling Testing | PART 4](https://youtu.be/5YQg1MpXpmE)
 
+### 🏗️ Prepare a model class for testing
 ```dart
 import 'package:clean_architecture_testing/constants/constants.dart';
 import 'package:clean_architecture_testing/core/error/exception.dart';
@@ -465,6 +466,8 @@ void main() {
   });
 }
 ```
+
+✅ Add a test class for a datasource class 
 
 lib/data/data_sources/remote_data_source.dart
 ```dart
