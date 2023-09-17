@@ -501,4 +501,141 @@ class WeatherRemoteDataSourceImpl extends WeatherRemoteDataSource {
 }
 ```
 
+## [Repository Implementation Testing | PART 5](https://youtu.be/NxC9bd9Bp4Q?si=rTnCeRve04wkKA_j)
+
+test/helpers/test_helper.dart
+```dart
+@GenerateMocks(
+  [
+    WeatherRepository,
+    WeatherRemoteDataSource, // added
+  ],
+  customMocks: [
+    MockSpec<http.Client>(
+      as: #MockHttpClient,
+    ),
+  ],
+)
+void main() {}
+
+```
+
+test/data/repositories/weather_repository_impl_test.dart
+```dart
+
+void main() {
+  late MockWeatherRemoteDataSource mockWeatherRemoteDataSource;
+  late WeatherRepositoryImpl weatherRepositoryImpl;
+
+  setUp(() {
+    mockWeatherRemoteDataSource = MockWeatherRemoteDataSource();
+    weatherRepositoryImpl = WeatherRepositoryImpl(
+      weatherRemoteDataSource: mockWeatherRemoteDataSource,
+    );
+  });
+
+  const testWeatherModel = WeatherModel(
+    cityName: 'Tokyo',
+    main: 'Clear',
+    description: 'clear sky',
+    iconCode: '01n',
+    temperature: 292.87,
+    pressure: 1012,
+    humidity: 70,
+  );
+
+  const testWeatherEntity = WeatherEntity(
+    cityName: 'Tokyo',
+    main: 'Clear',
+    description: 'clear sky',
+    iconCode: '01n',
+    temperature: 292.87,
+    pressure: 1012,
+    humidity: 70,
+  );
+
+  const testCityName = 'Tokyo';
+
+  group('get current weather', () {
+    test(
+      'should return current weather when a call to data source is success',
+      () async {
+        // arrange
+        when(mockWeatherRemoteDataSource.getCurrentWeather(testCityName))
+            .thenAnswer((_) async => testWeatherModel);
+
+        // act
+        final result =
+            await weatherRepositoryImpl.getCurrentWeather(testCityName);
+
+        // assert
+        expect(result, equals(const Right(testWeatherEntity)));
+      },
+    );
+  });
+}
+
+lib/data/repositories/weather_repository_impl.dart
+```dart
+
+class WeatherRepositoryImpl extends WeatherRepository {
+  final WeatherRemoteDataSource weatherRemoteDataSource;
+  WeatherRepositoryImpl({
+    required this.weatherRemoteDataSource,
+  });
+
+  @override
+  Future<Either<Failure, WeatherEntity>> getCurrentWeather(
+      String cityName) async {
+    try {
+      final result = await weatherRemoteDataSource.getCurrentWeather(cityName);
+      return Right(result.toEntity());
+    } on ServerException {
+      return const Left(ServerFailure('An error occurred on the server side.'));
+    } on SocketException {
+      return const Left(ConnectionFailure('Failed to connect to the network.'));
+    }
+  }
+
+ test(
+      'should return current weather when a call to data source is unsuccessful',
+      () async {
+        // arrange
+        when(mockWeatherRemoteDataSource.getCurrentWeather(testCityName))
+            .thenThrow(ServerException());
+
+        // act
+        final result =
+            await weatherRepositoryImpl.getCurrentWeather(testCityName);
+
+        // assert
+        expect(
+            result,
+            equals(const Left(
+                ServerFailure('An error occurred on the server side.'))));
+      },
+    );
+
+    test(
+      'should return server failure weather when the device is offline',
+      () async {
+        // arrange
+        when(mockWeatherRemoteDataSource.getCurrentWeather(testCityName))
+            .thenThrow(
+                const SocketException('Failed to connect to the network.'));
+
+        // act
+        final result =
+            await weatherRepositoryImpl.getCurrentWeather(testCityName);
+
+        // assert
+        expect(
+            result,
+            equals(const Left(
+                ConnectionFailure('Failed to connect to the network.'))));
+      },
+    );
+}
+```
+
 
